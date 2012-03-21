@@ -1,0 +1,15 @@
+Caution: IANAStatistican!
+
+Beside that, the reliability of the check heavenly depends on your data and matching frequency.
+
+Example:
+./check_graphite.r graphite.example.org stats.host123.disk_free 3 '<50,<20' '<100*90,<100*45'
+
+This would alert:
+- critical  if disk_free is currently below 20GB
+- critical  if disk_free will be below 100GB in 90 days(*)
+- warning   if disk_free will be below 100GB in 45 days(*)
+
+
+
+(*) actually, this means "in FREQUENCY * n" extrapolated datapoints.
