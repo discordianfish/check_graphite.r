@@ -14,7 +14,6 @@ month = as.numeric(months)
 csv = c(NA,NA,NA)
 while (month >= 0) {
   url = sprintf("http://%s/render/?target=%s&format=csv&from=-%imonths&until=-%imonths", graphite, target, month+1, month)
-  print(paste("using: ", url))
 
   new = read.table(url, sep = ",")
   csv = rbind(csv, new)
@@ -23,13 +22,12 @@ while (month >= 0) {
 
 exit = function(state, message)
 {
-  print(paste(state, message, sep = ""))
+  cat(paste(state, message, sep = ""))
   quit("no", switch(state, "CRITICAL" = 2, "WARNING" = 1, "OK" = 0))
 }
 
 metrics = as.numeric(csv[, 3])
 metrics = metrics[is.finite(metrics)]
-print(metrics)
 metrics = ts(metrics, start = 0, frequency = FREQUENCY) # in days
 
 fit = HoltWinters(metrics)
@@ -45,12 +43,10 @@ fit = HoltWinters(metrics)
 warning = FALSE
 for (cp in conditions)
 {
-  #print(cp)
   pair = strsplit(cp,',')
   state = "CRITICAL"
   for (condition in rev(unlist(pair)))
   {
-    # print(condition)
     op = substring(condition,0,1)
     rem = substring(condition,2)
 
@@ -62,12 +58,8 @@ for (cp in conditions)
     hit = FALSE
 
     if (is.na(predict)) {
-      print("no offset given")
-
       latest = tail(metrics,1)
-      print(paste("Lastest: ", latest))
-      print(paste("Threshold: ", threshold))
-      message = sprintf(": %s = %s; %s %s", target, latest, op, threshold)
+      message = sprintf(": %s = %s; %s %s\n", target, latest, op, threshold)
 
       if (op == '>') {
         if (latest > threshold) {
@@ -79,10 +71,8 @@ for (cp in conditions)
         }
       }
     } else {
-      print("forecasting..")
       prediction = predict(fit,n.ahead=as.numeric(predict) * FREQUENCY)
       predicted = tail(prediction,1)
-      print(paste("predicted: ", predicted))
       if (op == '>') {
         if (predicted > threshold) {
           hit = TRUE
@@ -92,7 +82,7 @@ for (cp in conditions)
           hit = TRUE
         }
       }
-      message = sprintf(": %s = ~%s; %s %s", target, predicted, op, threshold)
+      message = sprintf(": %s = ~%s; %s %s\n", target, predicted, op, threshold)
     }
 
     if (hit)
@@ -110,7 +100,7 @@ for (cp in conditions)
 }
 
 if (warning == FALSE) {
-  exit("OK", sprintf(": %s = %s, %s %s", target, tail(metrics,1), op, threshold))
+  exit("OK", sprintf(": %s = %s, %s %s\n", target, tail(metrics,1), op, threshold))
 } else
 {
   exit("WARNING", message)
