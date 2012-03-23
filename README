@@ -7,9 +7,12 @@ Example:
 
 This would alert:
 - critical  if disk_free is currently below 20GB
-- critical  if disk_free will be below 100GB in 90 days(*)
-- warning   if disk_free will be below 100GB in 45 days(*)
+- critical  if disk_free will be below 100GB in 45 days(*)
+- warning   if disk_free will be below 100GB in 90 days(*)
+- warning   if disk_free is currently below 50GB
 
+
+This check is quite expensive, so make sure it's not killing your nagios server.
 
 
 (*) actually, this means "in FREQUENCY * n" extrapolated datapoints.
