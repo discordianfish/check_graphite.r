@@ -82,7 +82,7 @@ for (cp in conditions)
           hit = TRUE
         }
       }
-      message = sprintf(": %s = ~%s; %s %s\n", target, predicted, op, threshold)
+      message = sprintf(": %s(%s periods) = ~%s; %s %s\n", target, predict, predicted, op, threshold)
     }
 
     if (hit)
